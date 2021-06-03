@@ -38,7 +38,7 @@ async function init() {
             `
             CREATE DATABASE IF NOT EXISTS \`${database}\`;
 
-            USE DATABASE \`${database}\`;
+            USE \`${database}\`;
 
             CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean);
             `,
