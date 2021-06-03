@@ -35,7 +35,7 @@ async function init() {
 
     await new Promise((acc, rej) => {
         pool.query(
-            'CREATE DATABASE IF NOT EXISTS ?', [database],
+            'CREATE DATABASE IF NOT EXISTS ' + database,
             err => {
                 if (err) return rej(err);
 
