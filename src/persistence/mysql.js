@@ -33,10 +33,12 @@ async function init() {
         port,
     });
 
+    pool.query()
+
     return new Promise((acc, rej) => {
         pool.query(
             `
-            CREATE DATABASE IF NOT EXISTS \`${database}\`;
+            CREATE SCHEMA IF NOT EXISTS \`${database}\`;
 
             USE \`${database}\`;
 
