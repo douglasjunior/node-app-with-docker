@@ -30,7 +30,6 @@ async function init() {
         host,
         user,
         password,
-        database,
         port,
     });
 
@@ -44,6 +43,23 @@ async function init() {
                 acc();
             },
         );
+    });
+
+    await new Promise((acc, rej) => {
+        pool.end(err => {
+            if (err) return rej(err);
+
+            acc();
+        });
+    });
+
+    pool = mysql.createPool({
+        connectionLimit: 5,
+        host,
+        user,
+        password,
+        database,
+        port,
     });
 
     await new Promise((acc, rej) => {
