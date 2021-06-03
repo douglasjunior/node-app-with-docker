@@ -11,6 +11,7 @@ const {
     MYSQL_PASSWORD_FILE: PASSWORD_FILE,
     MYSQL_DB: DB,
     MYSQL_DB_FILE: DB_FILE,
+    MYSQL_PORT: PORT,
 } = process.env;
 
 let pool;
@@ -20,8 +21,9 @@ async function init() {
     const user = USER_FILE ? fs.readFileSync(USER_FILE) : USER;
     const password = PASSWORD_FILE ? fs.readFileSync(PASSWORD_FILE) : PASSWORD;
     const database = DB_FILE ? fs.readFileSync(DB_FILE) : DB;
+    const port = PORT;
 
-    await waitPort({ host, port : 3306});
+    await waitPort({ host, port });
 
     pool = mysql.createPool({
         connectionLimit: 5,
@@ -29,19 +31,34 @@ async function init() {
         user,
         password,
         database,
+        port,
     });
 
-    return new Promise((acc, rej) => {
+    await new Promise((acc, rej) => {
+        pool.query(
+            'CREATE DATABASE IF NOT EXISTS ?', [database],
+            err => {
+                if (err) return rej(err);
+
+                console.log(`Database created ${database}`);
+                acc();
+            },
+        );
+    });
+
+    await new Promise((acc, rej) => {
         pool.query(
             'CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean)',
             err => {
                 if (err) return rej(err);
 
-                console.log(`Connected to mysql db at host ${HOST}`);
+                console.log(`Table created ${database}`);
                 acc();
             },
         );
     });
+
+    console.log(`Connected to mysql db at host ${host}`);
 }
 
 async function teardown() {
