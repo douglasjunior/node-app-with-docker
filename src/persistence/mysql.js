@@ -33,48 +33,23 @@ async function init() {
         port,
     });
 
-    await new Promise((acc, rej) => {
+    return new Promise((acc, rej) => {
         pool.query(
-            'CREATE DATABASE IF NOT EXISTS ?', [database],
+            `
+            CREATE DATABASE IF NOT EXISTS \`${database}\`;
+
+            USE DATABASE \`${database}\`;
+
+            CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean);
+            `,
             err => {
                 if (err) return rej(err);
 
-                console.log(`Database created ${database}`);
+                console.log(`Connected to mysql db at host ${host}`);
                 acc();
             },
         );
     });
-
-    await new Promise((acc, rej) => {
-        pool.end(err => {
-            if (err) return rej(err);
-
-            acc();
-        });
-    });
-
-    pool = mysql.createPool({
-        connectionLimit: 5,
-        host,
-        user,
-        password,
-        database,
-        port,
-    });
-
-    await new Promise((acc, rej) => {
-        pool.query(
-            'CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean)',
-            err => {
-                if (err) return rej(err);
-
-                console.log(`Table created ${database}`);
-                acc();
-            },
-        );
-    });
-
-    console.log(`Connected to mysql db at host ${host}`);
 }
 
 async function teardown() {
